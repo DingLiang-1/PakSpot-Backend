@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+    <html lang = "en">
+        <head>
+            <meta charset = "UTF-8">
+            <title>PakSpot</title> 
+            <link rel = "stylesheet" href = "./HomePage.css">
+            <link rel= "stylesheet" href= "https://cdn.jsdelivr.net/npm/@splidejs/splide@4.0.7/dist/css/splide.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        </head>
+        
+        <body> 
+            <main>
+                <div class = "wrapper">
+                    <div class="mynav">
+                        <div class = "logo">
+                            <img src = "./Icons/appIcon.png"/>
+                            <h2>PakSpot</h2>
+                        </div>
+                        <ul>
+                            <a href= ""><li class="icon fa fa-home" id="uno"></li></a>
+                            <a href= ""><li class="icon fa fa-compass" id="dos"></li></a>
+                            <a href= ""><li class="icon fa fa-plus-square-o" id="tres"></li></a>
+                            <a href="./Planner.html"><li class="icon fa fa-calendar-o" id="cuatro"></li></a>
+                            <a href=""><li class="icon fa fa-user" id="cuatro"></li></a>
+                          </ul>
+                    </div>
+
+                    <div class = "feed"> 
+                        <div class = "post">
+                            <form action = "/" method = "post" class = "plannerPopup post1 open-planner-popup">
+                                <h3>Set a date!</h3>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupDate">Date</label>
+                                    <input id = "plannerPopupDate" name = "plannerPopupDate" type = "text" placeholder="DD/MM/YYYY">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupStartTime">Start Time</label>
+                                    <input id = "plannerPopupStartTime" name = "plannerPopupStartTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupEndTime">End Time</label>
+                                    <input id = "plannerPopupEndTime" name = "plannerPopupEndTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupeDescription">Description</label>
+                                    <input id = "plannerPopupDescription" name = "plannerPopupDescription" type = "text">
+                                </div>             
+                                <button type = "submit" onclick = "return false" class = "post1">Submit</button>
+                            </form>
+                            <h3>Tanjong Beach Club</h3>
+                            <div class = "media">
+                                <section class="splide" id="splide1" aria-label="Splide Basic HTML Example">
+                                    <div class="splide__track">
+                                        <ul class="splide__list">
+                                            <li class="splide__slide"> <img src = "./Images/TanjongBeachClub/Image1.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/TanjongBeachClub/Image2.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/TanjongBeachClub/Image3.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/TanjongBeachClub/Image4.jpg"/></li>
+                                        </ul>
+                                    </div>
+                                </section>
+                                <div class = "postIcons">
+                                    <button class = "post1" type = "button"><i class="fa-regular fa-heart fa-3x"></i></button>
+                                    <button class = "post1" type = "button"><i class="fa-regular fa-comment fa-3x"></i></button>
+                                    <button class = "post1" type = "button"><i class="fa-regular fa-bookmark fa-3x"></i></button>
+                                    <button class = "post1"><i class="fa-regular fa-calendar-days fa-3x"></i></button>
+                                </div>
+                            </div>
+                            <p>Our surf plays host to a myriad of celebrations and private events. Tanjong Beach Club is the most sought-after event venue
+                                for good reason—pristine views for unforgettable weddings, golden sand for euphoric Sentosa beach parties and intimate
+                                corporate events that leave lasting impressions. Let your hair down, we'll take care of the rest.</p>
+                        </div>
+                        <div class = "post">
+                            <form class = "plannerPopup post2 open-planner-popup">
+                                <h3>Set a date!</h3>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupDate">Date</label>
+                                    <input id = "plannerPopupDate" name = "plannerPopupDate" type = "text" placeholder="DD/MM/YYYY">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupStartTime">Start Time</label>
+                                    <input id = "plannerPopupStartTime" name = "plannerPopupStartTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupEndTime">End Time</label>
+                                    <input id = "plannerPopupEndTime" name = "plannerPopupEndTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupeDescription">Description</label>
+                                    <input id = "plannerPopupDescription" name = "plannerPopupDescription" type = "text">
+                                </div>             
+                                <button type = "submit" onclick = "return false" class = "post2">Submit</button>
+                            </form>
+                            <h3>The Fragment Room</h3>
+                            <div class = "media">
+                                <section class="splide" id="splide2" aria-label="Splide Basic HTML Example">
+                                    <div class="splide__track">
+                                        <ul class="splide__list">
+                                            <li class="splide__slide"> <img src = "./Images/FragmentRoom/Image1.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/FragmentRoom/Image2.gif"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/FragmentRoom/Image3.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/FragmentRoom/Image4.jpg"/></li>
+                                        </ul>
+                                    </div>
+                                </section>
+                                <div class = "postIcons">
+                                    <button class = "post2" type = "button"><i class="fa-regular fa-heart fa-3x"></i></button>
+                                    <button class = "post2" type = "button"><i class="fa-regular fa-comment fa-3x"></i></button>
+                                    <button class = "post2" type = "button"><i class="fa-regular fa-bookmark fa-3x"></i></button>
+                                    <button class = "post2"><i class="fa-regular fa-calendar-days fa-3x"></i></button>
+                                </div>
+                            </div>
+                            <p>The Fragment Room is a rage room where you are encouraged to let down your walls and release your inner frustrations. 
+                                So your boss shouted at you. So your train broke down today. Wouldn’t 
+                                it be great to go somewhere and release your rage? Let’s smash that anger to fragments.</p>
+                        </div>
+                        <div class = "post">
+                            <form class = "plannerPopup post3 open-planner-popup">
+                                <h3>Set a date!</h3>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupDate">Date</label>
+                                    <input id = "plannerPopupDate" name = "plannerPopupDate" type = "text" placeholder="DD/MM/YYYY">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupStartTime">Start Time</label>
+                                    <input id = "plannerPopupStartTime" name = "plannerPopupStartTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupEndTime">End Time</label>
+                                    <input id = "plannerPopupEndTime" name = "plannerPopupEndTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupeDescription">Description</label>
+                                    <input id = "plannerPopupDescription" name = "plannerPopupDescription" type = "text">
+                                </div>             
+                                <button type = "submit" onclick = "return false" class = "post3">Submit</button>
+                            </form>
+                            <h3>Arudio Studio</h3>
+                            <div class = "media">
+                                <section class="splide" id="splide3" aria-label="Splide Basic HTML Example">
+                                    <div class="splide__track">
+                                        <ul class="splide__list">
+                                            <li class="splide__slide"> <img src = "./Images/ArudioPottery/Image1.png"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/ArudioPottery/Image2.gif"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/ArudioPottery/Image3.png"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/ArudioPottery/Image4.png"/></li>
+                                        </ul>
+                                    </div>
+                                </section>
+                                <div class = "postIcons">
+                                    <button class = "post3" type = "button"><i class="fa-regular fa-heart fa-3x"></i></button>
+                                    <button class = "post3" type = "button"><i class="fa-regular fa-comment fa-3x"></i></button>
+                                    <button class = "post3" type = "button"><i class="fa-regular fa-bookmark fa-3x"></i></button>
+                                    <button class = "post3"><i class="fa-regular fa-calendar-days fa-3x"></i></button>
+                                </div>
+                            </div>
+                            <p>Hand-building is one of the simplest methods for pottery making.  By using zero machinery but only your own hands, hand-built 
+                                pottery are highly customizable and unique. You will learn various basic hand building techniques, such as: Pinching, Coiling, 
+                                Slab making and Hollowing to create your own masterpiece! </p>
+                        </div>
+                        <div class = "post">
+                            <form class = "plannerPopup post4 open-planner-popup">
+                                <h3>Set a date!</h3>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupDate">Date</label>
+                                    <input id = "plannerPopupDate" name = "plannerPopupDate" type = "text" placeholder="DD/MM/YYYY">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupStartTime">Start Time</label>
+                                    <input id = "plannerPopupStartTime" name = "plannerPopupStartTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupEndTime">End Time</label>
+                                    <input id = "plannerPopupEndTime" name = "plannerPopupEndTime" type = "text" placeholder="HH:MM">
+                                </div>
+                                <div class = "plannerPopupInput">
+                                    <label for = "plannerPopupeDescription">Description</label>
+                                    <input id = "plannerPopupDescription" name = "plannerPopupDescription" type = "text">
+                                </div>             
+                                <button type = "submit" onclick = "return false" class = "post4">Submit</button>
+                            </form>
+                            <h3>Cozy Place</h3>
+                            <div class = "media">
+                                <section class="splide" id="splide4" aria-label="Splide Basic HTML Example">
+                                    <div class="splide__track">
+                                        <ul class="splide__list">
+                                            <li class="splide__slide"> <img src = "./Images/CozyPlace/Image1.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/CozyPlace/Image2.jpg"/></li>
+                                            <li class="splide__slide"> <img src = "./Images/CozyPlace/Image3.jpg"/></li>
+                                        </ul>
+                                    </div>
+                                </section>
+                                <div class = "postIcons">
+                                    <button class = "post1" type = "button"><i class="fa-regular fa-heart fa-3x"></i></button>
+                                    <button class = "post1" type = "button"><i class="fa-regular fa-comment fa-3x"></i></button>
+                                    <button class = "post1" type = "button"><i class="fa-regular fa-bookmark fa-3x"></i></button>
+                                    <button class = "post4"><i class="fa-regular fa-calendar-days fa-3x"></i></button>
+                                </div>
+                            </div>
+                            <p>At CozyPlace, we believe fun and entertainment is more about the company than the activities.
+                                Enjoy catching up on the latest movies/series in HD in a private cozy room with good company. 
+                                We provide the private and coziest environment for you while you provide the good company.  
+                            </p>
+                        </div>              
+                    </div>
+                </div>
+            </main>
+            <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.0.7/dist/js/splide.min.js"></script>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+            <script src = "./HomePage.js"></script>
+        </body>
+    </html>
+
+
+
+
+    
