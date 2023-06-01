@@ -31,7 +31,7 @@ app.post("/register",function(req,res) {
             password : req.body.passwordFirst
         });
         newUser.save();
-        res.redirect("/login");
+        res.redirect("/");
     } else {
         res.redirect("/register");
     }
@@ -41,7 +41,7 @@ app.get("/register", function(req,res) {
     res.sendFile(__dirname + "/Register.html");
 });
 
-app.get("/login",function(req,res) {
+app.get("/",function(req,res) {
     res.sendFile(__dirname + "/Login.html");
 });
 
@@ -51,13 +51,13 @@ app.post("/login",function(req,res) {
     userCred.find({username : username, password : password})
         .then(function(data) {
             if (data.length) {
-                res.redirect("/");
+                res.redirect("/homepage");
             } else {
-                res.redirect("/login");
+                res.redirect("/");
             }
         })
         .catch(function (err) {
-            res.redirect("/login")
+            res.redirect("/")
         }); 
 }); 
 
@@ -66,10 +66,10 @@ app.post("/noAccount", function (req,res) {
 });
 
 app.post("/gotAccount", function (req,res) {
-    res.redirect("/login");
+    res.redirect("/");
 });
 
-app.get("/",function(req,res) {
+app.get("/homepage",function(req,res) {
     res.sendFile(__dirname + "/HomePage.html");
 });
 
@@ -77,20 +77,20 @@ app.get("/planner", function(req,res) {
     res.sendFile(__dirname + "/Planner.html");
 });
 
-app.post("/", function(req,res) {
+app.post("/homepage", function(req,res) {
     res.sendFile(__dirname + "/HomePage.html");
 });
 
 app.post("/homeIcon", function(req,res) {
-    res.redirect("/");
+    res.redirect("/homepage");
 });
 
 app.post("/searchIcon", function(req,res) {
-    res.redirect("/");
+    res.redirect("/homepage");
 });
 
 app.post("/postIcon", function(req,res) {
-    res.redirect("/");
+    res.redirect("/homepage");
 });
 
 app.post("/plannerIcon", function(req,res) {
@@ -99,6 +99,7 @@ app.post("/plannerIcon", function(req,res) {
 
 
 app.listen(process.env.PORT || 3000, function(){
+
     console.log("server started at port 3000");
 });
 
