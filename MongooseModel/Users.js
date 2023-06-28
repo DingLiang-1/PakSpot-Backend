@@ -91,7 +91,8 @@ const userPostSchema = new mongoose.Schema({
             required : true
         }
     },
-    /*images : [{type:String}], */
+    images : [{type : String}],
+    description : {type :String },
     creator : {type : mongoose.Types.ObjectId, required : true, ref : "User"}
 });
 

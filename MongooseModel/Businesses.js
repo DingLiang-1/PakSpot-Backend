@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const businessSchema = new mongoose.Schema({
-    companyName : {
+    username : {
         type:String,
         required:true
     },
@@ -40,6 +40,7 @@ const businessPostSchema = new mongoose.Schema({
             required : true
         }
     },
+    description : {type :String},
     images : [{type:String}],
     creator : {type : mongoose.Types.ObjectId, required : true, ref : "Business"}
 });
