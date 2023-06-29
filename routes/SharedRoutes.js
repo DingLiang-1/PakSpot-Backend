@@ -27,8 +27,6 @@ const s3 = new S3Client({
     region: bucketRegion
 });
 
-
-
 router.post("/auth/:entity/register",[
     check("username").isLength({min : 8}),
     check("password").isLength({min : 8}),
@@ -36,7 +34,7 @@ router.post("/auth/:entity/register",[
 ],async function(req,res,next) {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {
-        return next(new Error("Invalid Inputs"));
+        return next(new Error("invalid email address, please try again!"));
     };
     const username = req.body.username;
     const email = req.body.email;
@@ -52,7 +50,7 @@ router.post("/auth/:entity/register",[
                 try {
                     hashedPassword = await bcrypt.hash(password, 12);
                 } catch (err) {
-                    return next(new Error("Unknown Error Occurred, Please try again!"));
+                    return next(new Error("Unknown error occurred, please register again!"));
                 };
                 const newUser = UsersDatabase.Users({
                     username : username,
@@ -63,7 +61,7 @@ router.post("/auth/:entity/register",[
                 return res.json({message : "Registration successful! Please proceed to login."});
             }
         } catch (err) {
-            return next(new Error("An error occurred while saving, please try again!").status(404));
+            return next(new Error("An error occurred while register, please try again!").status(404));
         };
     } else if (req.params.entity === "businesses") {
         let businessExist;
@@ -100,7 +98,7 @@ router.post("/auth/:entity/register",[
 router.post("/auth/:entity/login", check("email").normalizeEmail().isEmail(), async function(req,res,next) {
     const validationErrors = validationResult(req);
     if (!validationErrors.isEmpty()) {
-        return next(new Error("Invalid Inputs"));
+        return next(new Error("Invalid Inputs, please try again!"));
     }
     const email = req.body.email;
     const password = req.body.password;
@@ -112,13 +110,13 @@ router.post("/auth/:entity/login", check("email").normalizeEmail().isEmail(), as
             try{
                 exist = await UsersDatabase.Users.findOne({email : email});
             } catch(err) {
-                return next(new Error("An error occurred!"));
+                return next(new Error("An error occurred, please try again!"));
             }; 
         } else {
             try{
                 exist = await BusinessesDatabase.Businesses.findOne({email : email, password : password});
             } catch(err) {
-                return next(new Error("An error occurred!"));
+                return next(new Error("An error occurred, please try again!"));
             };  
         };
         let isValidPassword = false;
@@ -126,7 +124,7 @@ router.post("/auth/:entity/login", check("email").normalizeEmail().isEmail(), as
             try {
                 isValidPassword = await bcrypt.compare(password, exist.password);
             } catch(err) {
-                return next(new Error("An error occurred!, Please try again"));
+                return next(new Error("An error occurred!, please try again"));
             }
             if (isValidPassword) {
                 let token;
@@ -141,7 +139,7 @@ router.post("/auth/:entity/login", check("email").normalizeEmail().isEmail(), as
                 return res.status(200).json({userId : exist.id, token : token});
             };
         };
-        return next(new Error("Login unsuccessful, please try again!"));
+        return next(new Error("Login unsuccessful, wrong email/password, please try again!"));
     };
 });
 
@@ -229,42 +227,42 @@ router.get("/personalpost/:entity/:UID", async (req,res,next) => {
 });
 
 router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (req,res,next) => {
-    let imageKeys = [];
-    try {
-        if(req.files) {
-            let imageKeysPromise = Promise.all(req.files.map( async (file) => { 
-                let fileName = file.originalname + v4();
-                const s3Params = {
-                    Bucket : bucketName,
-                    Key : fileName,
-                    Body : file.buffer,
-                    ContentType : file.mimetype,
-                };
-                const command = new PutObjectCommand(s3Params);
-                try {
-                    await s3.send(command);
-                } catch(err) {
-                    console.log(err);
-                    return next(new Error("Upload unsuccessful"));
-                };
-                return fileName;
-            }));
-            await imageKeysPromise.then(imageKeysArray => {imageKeys = imageKeysArray});
-        } else {
-            return next(new Error("No images found, please try again!"));
-        };
-    } catch(err) {
-        return next(new Error("Upload unsuccessful"));
-    };
     const {location, address, description} = req.body;
     if (req.params.entity !== "users" && req.params.entity !== "businesses") {
-        return next(new Error("Route not found!").status(404));
+        return next(new Error("Route not found!"));
     } else {
         let coor;
         try {
             coor = await getCoorForAddress(address);
         } catch(err) {
-            return next(new Error("Invalid Address, please try again"));
+            return next(new Error("The inputted address is not recognised, please try again."));
+        };
+        let imageKeys = [];
+        try {
+            if(req.files) {
+                let imageKeysPromise = Promise.all(req.files.map( async (file) => { 
+                    let fileName = file.originalname + v4();
+                    const s3Params = {
+                        Bucket : bucketName,
+                        Key : fileName,
+                        Body : file.buffer,
+                        ContentType : file.mimetype,
+                    };
+                    const command = new PutObjectCommand(s3Params);
+                    try {
+                        await s3.send(command);
+                    } catch(err) {
+                        console.log(err);
+                        return next(new Error("An unknown error occurred, please try again!"));
+                    };
+                    return fileName;
+                }));
+                await imageKeysPromise.then(imageKeysArray => {imageKeys = imageKeysArray});
+            } else {
+                return next(new Error("No images found, please try again!"));
+            };
+        } catch(err) {
+            return next(new Error("An unknown error occurred, please try again!"));
         };
         let upload;
         if (req.params.entity === "users") {
@@ -289,7 +287,7 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
                 await sess.commitTransaction();
                 return res.status(200).json({message : "upload successful"});
             } catch(err) {
-                return next(new Error("Unknown Error Occurred here!"));
+                return next(new Error("An unknown error occurred, please try again!"));
             };
         } else {
             upload = new BusinessesDatabase.BusinessPosts({
