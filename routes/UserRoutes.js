@@ -88,20 +88,96 @@ router.post("/addscheduledevent/:UID", validateAuthToken, async (req, res, next)
     };
 });
 
-/*
-router.patch("/editscheduledevent/:UID", async (req,res,next) => {
-    let {date, startTime, endTime, description} = req.body;
+
+router.post("/editscheduledevent/:UID", async (req,res,next) => {
+    let {date, startTime, endTime, description, eventId, eventDayId} = req.body;
     let user;
+    let eventDayLength;
+    let origEvent;
     try {
-        UsersDatabase.Users.findById(req.params.UID);
+        user = await UsersDatabase.Users.findById(req.params.UID);
     } catch(err) {
         return next(new Error("User not Found"));
-    }
+    };
+    try {
+        origEvent = {...user.events.id(eventDayId).events.id(eventId)};
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await user.events.id(eventDayId).events.pull(eventId);
+        await user.save();
+        eventDayLength = await user.events.id(eventDayId).events.length;
+        if (!eventDayLength) { 
+            await user.events.pull(eventDayId);
+            await user.save();
+        };
+        date = new Date(date);
+        let dateDay = date.getDate().toString();
+        let dateMonth = (date.getMonth() + 1).toString();
+        let dateYear = date.getFullYear().toString();
+        let datePresent;
+        let event;
+        try {
+            datePresent = user.events.filter((docs) => (docs.year === dateYear && docs.month === dateMonth && docs.day === dateDay));
+        } catch(err) {
+            return next(new Error("Unknown error, please try again"));
+        };
+        if (datePresent.length) {
+            try {
+                event = await datePresent[0].events.filter((docs) => (docs.startTime === startTime && docs.endTime === endTime));
+            } catch(err) {
+                return next(new Error("Unknown error, please try again"));
+            };
+            if (event.length) {
+                return next(new Error("An event is already scheduled at specified date and time. Please try again."));
+            } else {
+                try {
+                    await user.events.id(datePresent[0]._id).events.push({...origEvent, startTime : startTime, endTime : endTime, description : description});
+                    await user.save()
+                } catch(err) {
+                    return next(new Error("Unknown error, please try again"));
+                };
+            };
+        } else {
+            try {
+                await user.events.push({year : dateYear, month : dateMonth, day : dateDay, events : [{...origEvent, startTime : startTime, endTime : endTime, description : description}]});
+                await user.save();
+            } catch(err) {
+                return next(new Error("Unknown error, please try again"));
+            };
+        };
+        await sess.commitTransaction();
+        return res.status(200).json({message : "Event updated succesfully"});
+    } catch(err) {
+        return next(new Error("An unknown error occured, please try again"));
+    };
+});
+        
 
-}
-
-router.delete("/deletescheduledevent/:UID")
-*/
+router.post("/deletescheduledevent/:UID", async (req,res,next) => {
+    let user;
+    let eventDayLength;
+    try {
+        user = await UsersDatabase.Users.findById(req.params.UID);
+    } catch(err) {
+        return next(new Error("User not Found"));
+    };
+    let {eventDayId, eventId} = req.body;
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await user.events.id(eventDayId).events.pull(eventId);
+        await user.save();
+        eventDayLength = await user.events.id(eventDayId).events.length;
+        if (!eventDayLength) { 
+            await user.events.pull(eventDayId);
+            await user.save();
+        };
+        await sess.commitTransaction();
+        return res.status(200).json({message : "Event deleted succesfully"});
+    } catch {
+        return next(new Error("An unknown error occured, please try again"));
+    };
+});
 
 module.exports = router;
 
