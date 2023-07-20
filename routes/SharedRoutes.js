@@ -18,7 +18,6 @@ const bucketName = process.env.BUCKET_NAME;
 const accessKey = process.env.ACCESS_KEY;
 const bucketRegion = process.env.BUCKET_REGION;
 const secretAccessKey = process.env.SECRET_ACCESS_KEY;
-
 const s3 = new S3Client({
     credentials:{
         accessKeyId : accessKey,
@@ -26,73 +25,75 @@ const s3 = new S3Client({
     },
     region: bucketRegion
 });
+/*
+router.use(validateAuthToken);
+*/
 
-router.post("/auth/:entity/register",[
-    check("username").isLength({min : 8}),
+router.post("/auth/:entity/register",
+    [check("username").isLength({min : 8}),
     check("password").isLength({min : 8}),
-    check("email").normalizeEmail().isEmail()
-],async function(req,res,next) {
-    const validationErrors = validationResult(req);
-    if (!validationErrors.isEmpty()) {
-        return next(new Error("invalid email address, please try again!"));
-    };
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = req.body.password;
-    if (req.params.entity === "users") {
-        let userExist;
-        try {
-            userExist = await UsersDatabase.Users.find({email : email});
-            if (userExist.length) {
-                return next(new Error("This Email already has an Account!"));
-            } else {
-                let hashedPassword;
-                try {
-                    hashedPassword = await bcrypt.hash(password, 12);
-                } catch (err) {
-                    return next(new Error("Unknown error occurred, please register again!"));
-                };
-                const newUser = UsersDatabase.Users({
-                    username : username,
-                    password : hashedPassword,
-                    email : email,
-                });
-                await newUser.save();
-                return res.json({message : "Registration successful! Please proceed to login."});
-            }
-        } catch (err) {
-            return next(new Error("An error occurred while register, please try again!").status(404));
+    check("email").normalizeEmail().isEmail()],
+    async function(req,res,next) {
+        const validationErrors = validationResult(req);
+        if (!validationErrors.isEmpty()) {
+            return next(new Error("invalid email address, please try again!"));
         };
-    } else if (req.params.entity === "businesses") {
-        let businessExist;
-        try {
-            businessExist = await BusinessesDatabase.Businesses.find({email : email});
-            if (businessExist.length) {
-                return next(new Error("This Email already has an Account!").status(400));
-            } else {
-                let hashedPassword;
-                try {
-                    hashedPassword = await bcrypt.hash(password, 12);
-                } catch (err) {
-                    return next(new Error("Unknown Error Occurred, Please try again!"));
+        const username = req.body.username;
+        const email = req.body.email;
+        const password = req.body.password;
+        if (req.params.entity === "users") {
+            let userExist;
+            try {
+                userExist = await UsersDatabase.Users.find({email : email});
+                if (userExist.length) {
+                    return next(new Error("This Email already has an Account!"));
+                } else {
+                    let hashedPassword;
+                    try {
+                        hashedPassword = await bcrypt.hash(password, 12);
+                    } catch (err) {
+                        return next(new Error("Unknown error occurred, please register again!"));
+                    };
+                    const newUser = UsersDatabase.Users({
+                        username : username,
+                        password : hashedPassword,
+                        email : email,
+                    });
+                    await newUser.save();
+                    return res.json({message : "Registration successful! Please proceed to login."});
+                }
+            } catch (err) {
+                return next(new Error("An error occurred while register, please try again!").status(404));
+            };
+        } else if (req.params.entity === "businesses") {
+            let businessExist;
+            try {
+                businessExist = await BusinessesDatabase.Businesses.find({email : email});
+                if (businessExist.length) {
+                    return next(new Error("This Email already has an Account!").status(400));
+                } else {
+                    let hashedPassword;
+                    try {
+                        hashedPassword = await bcrypt.hash(password, 12);
+                    } catch (err) {
+                        return next(new Error("Unknown Error Occurred, Please try again!"));
+                    };
+                    const newBusiness = new BusinessesDatabase.Businesses({
+                        companyName : username,
+                        password : hashedPassword,
+                        email : email,
+                    });
+                    await newBusiness.save();
+                    return res.status(200).json({message : "Registration successful! Please proceed to login."});
                 };
-                const newBusiness = new BusinessesDatabase.Businesses({
-                    companyName : username,
-                    password : hashedPassword,
-                    email : email,
-                });
-                await newBusiness.save();
-                return res.status(200).json({message : "Registration successful! Please proceed to login."});
-            }
-        } catch (err) {
-            return next(new Error("An error occurred while saving, please try again!"));
+            } catch (err) {
+                return next(new Error("An error occurred while saving, please try again!"));
+            };
+        } else {
+            return next(new Error("Route not found!"));
         };
-    } else {
-        return next(new Error("Route not found!"));
-    };
-});
-
-
+    }
+);
 
 
 router.post("/auth/:entity/login", check("email").normalizeEmail().isEmail(), async function(req,res,next) {
@@ -144,14 +145,6 @@ router.post("/auth/:entity/login", check("email").normalizeEmail().isEmail(), as
 });
 
 
-
-
-/*
-
-router.use(validateAuthToken);
-
-}
-*/
 router.get("/feed", async (req,res,next) => {
     try {
         let data = await BusinessesDatabase.BusinessPosts.find();
@@ -280,7 +273,7 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
                 const sess = await mongoose.startSession();
                 sess.startTransaction();
                 await upload.save({session : sess});
-                let user = await UsersDatabase.Users.findById(req.params.UID);
+                let user = await UsersDatabase.Users.findOne({_id : req.params.UID});
                 user.posts.push(upload);
                 await user.save({session : sess});
                 await sess.commitTransaction();
@@ -304,7 +297,7 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
                 const sess = await mongoose.StartSession();
                 sess.startTransaction();
                 await upload.save({session : sess});
-                let business = await BusinessesDatabase.Businesses.findById(req.params.UID);
+                let business = await BusinessesDatabase.Businesses.findOne({_id : req.params.UID});
                 business.posts.push(upload);
                 await business.save({session : sess});
                 await sess.commitTransaction();
@@ -318,7 +311,10 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
 
 
 router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (req,res,next) => {
-    const {location, description, address, remainingImageKeys, id} = req.body;
+    let {location, description, address, remainingImageKeys, id} = req.body;
+    if ((typeof remainingImageKeys) === "string") {
+        remainingImageKeys = [remainingImageKeys];
+    };
     let post;
     try {
         post = await UsersDatabase.UserPosts.findOne({_id : id});
@@ -339,7 +335,6 @@ router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (re
             if (!remainingImageKeys) {
                 deletedImageKeys = post.images;
             } else {
-                console.log(post);
                 deletedImageKeys = post.images.filter(key => (!remainingImageKeys.includes(key)));
                 console.log(deletedImageKeys);
             };
@@ -351,9 +346,7 @@ router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (re
                 let command = new DeleteObjectCommand(param);
                 try {
                     await s3.send(command);
-                    console.log("pass2");
                 } catch {
-                    console.log("pass3");
                     return new Error("An unknown error occurred, please try again!");
                 }
             });
@@ -392,7 +385,6 @@ router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (re
         } else {
             imageKeys = remainingImageKeys.concat(imageKeys);
         };
-        console.log(imageKeys);
         let updatedUpload;
         if (req.params.entity === "users") {
             updatedUpload = {
@@ -427,7 +419,7 @@ router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (re
                 description : description,
             };
             try {
-                const sess = await mongoose.StartSession();
+                const sess = await mongoose.startSession();
                 sess.startTransaction();
                 await BusinessesDatabase.Businesses.replaceOne({_id : id}, updatedUpload);
                 await sess.commitTransaction();
@@ -438,9 +430,32 @@ router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (re
         };
     };
 });
-/*
 
-router.delete("/deletepersonalpost/:entity/:uuid")
-*/
+
+router.post("/deletepersonalpost/:entity/:UID", async (req,res,next) => {
+    const {postId} = req.body;
+    let post;
+    let user;
+    try {
+        if (req.params.entity === "users") {
+            post = await UsersDatabase.UserPosts.findOne({_id : postId});
+            user = await UsersDatabase.Users.findOne({_id : req.params.UID});
+        } else {
+            post = await BusinessesDatabase.BusinessPosts.findOne({_id : postId});
+            user = await BusinessesDatabase.Businesses.findOne({_id : req.params.UID});
+        };
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await UsersDatabase.UserPosts.deleteOne({_id : postId});
+        await user.posts.pull(post);
+        await user.save({session :sess});
+        await sess.commitTransaction();
+        return res.status(200).json({message : "Delete sucessful"});
+    } catch {
+        return next(new Error("Unknown Error Occurred!"));
+    };
+});
+
+
 
 module.exports = router;

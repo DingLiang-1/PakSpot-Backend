@@ -64,6 +64,9 @@ const userSchema = new mongoose.Schema({
         type:String,
         required: true
     },
+    profilePicture : {
+        type:String,
+    },
     posts : [{
         type : mongoose.Types.ObjectId,
         required: true,
@@ -93,6 +96,7 @@ const userPostSchema = new mongoose.Schema({
     },
     images : [{type : String}],
     description : {type :String },
+    tags : [{type : String}],
     creator : {type : mongoose.Types.ObjectId, required : true, ref : "User"}
 });
 

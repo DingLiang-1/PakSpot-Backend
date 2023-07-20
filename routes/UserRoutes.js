@@ -166,11 +166,11 @@ router.post("/deletescheduledevent/:UID", async (req,res,next) => {
         const sess = await mongoose.startSession();
         sess.startTransaction();
         await user.events.id(eventDayId).events.pull(eventId);
-        await user.save();
+        await user.save({session : sess});
         eventDayLength = await user.events.id(eventDayId).events.length;
         if (!eventDayLength) { 
             await user.events.pull(eventDayId);
-            await user.save();
+            await user.save({session : sess});
         };
         await sess.commitTransaction();
         return res.status(200).json({message : "Event deleted succesfully"});
