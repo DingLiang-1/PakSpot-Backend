@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema({
     },
     profilePicture : {
         type:String,
+        required:true
     },
     posts : [{
         type : mongoose.Types.ObjectId,
