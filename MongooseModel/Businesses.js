@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const businessSchema = new mongoose.Schema({
-    username : {
+    username: {
         type:String,
         required:true
     },
@@ -14,11 +14,23 @@ const businessSchema = new mongoose.Schema({
         type:String,
         required: true
     },
+    profilePicture : {
+        type:String,
+        required:true
+    },
     posts : [{
         type : mongoose.Types.ObjectId,
-        required: true,
-        ref : "BusinessPost"
+        required : true,
+        ref : "UserPost",
     }],
+    bookmarked : [{
+        type : mongoose.Types.ObjectId,
+        required : true,
+        ref : "BusinessPost",
+    }],
+    resetCache : {
+        type:String
+    }
 });
 
 const businessPostSchema = new mongoose.Schema({
@@ -40,8 +52,9 @@ const businessPostSchema = new mongoose.Schema({
             required : true
         }
     },
-    description : {type :String},
-    images : [{type:String}],
+    images : [{type : String}],
+    description : {type :String },
+    tags : [{type : String}],
     creator : {type : mongoose.Types.ObjectId, required : true, ref : "Business"}
 });
 

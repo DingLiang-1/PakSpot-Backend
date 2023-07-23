@@ -70,10 +70,18 @@ const userSchema = new mongoose.Schema({
     },
     posts : [{
         type : mongoose.Types.ObjectId,
-        required: true,
+        required : true,
         ref : "UserPost"
     }],
-    events : [{type:userEventSchema,default : []}]
+    events : [{type:userEventSchema,default : []}],
+    bookmarked : [{
+        type : mongoose.Types.ObjectId,
+        required : true,
+        ref : "BusinessPost"
+    }],
+    resetCache : {
+        type:String
+    }
 });
 
 const userPostSchema = new mongoose.Schema({
