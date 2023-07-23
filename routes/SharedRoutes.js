@@ -150,7 +150,7 @@ router.get("/auth/getverificationcode/:entity/:email", async (req, res, next) =>
             service: "gmail",
             auth: {
               user: 'simdinghao@gmail.com',
-              pass: "ajupsekvcfsvxmmk"
+              pass: process.env.GMAIL_KEY
             }
         });
         const token = v4();
