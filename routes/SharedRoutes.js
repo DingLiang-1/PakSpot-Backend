@@ -504,11 +504,14 @@ router.get("/bookmarkpost/:entity/:UID", async (req,res,next) => {
 router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (req,res,next) => {
     const {location, address, description,stringTag} = req.body;
     let arrayTag = stringTag.split("#").map(tag => (tag.trim())).slice(1);
-    let collection;
+    let postCollection;
+    let userCollection;
     if (req.params.entity === "users") {
-        collection = UsersDatabase.Users;
+        postCollection = UsersDatabase.UserPosts;
+        userCollection = UsersDatabase.Users;
     } else if (req.params.entity === "businesses") {
-        collection = BusinessesDatabase.Businesses;
+        postCollection = BusinessesDatabase.BusinessPosts;
+        userCollection = BusinessesDatabase.Businesses;
     } else {
         return next(new Error("Route not found!"));
     }
@@ -545,7 +548,7 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
     } catch(err) {
         return next(new Error("An unknown error occurred, please try again!"));
     };
-    let upload = new collection({
+    let upload = new postCollection({
         location : location,
         address : address,
         coor : {
@@ -561,7 +564,7 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
         const sess = await mongoose.startSession();
         sess.startTransaction();
         await upload.save({session : sess});
-        let user = await collection.findOne({_id : req.params.UID});
+        let user = await userCollection.findById(req.params.UID);
         user.posts.push(upload);
         await user.save({session : sess});
         await sess.commitTransaction();
@@ -574,7 +577,6 @@ router.post("/uploadpersonalpost/:entity/:UID", multer.array("uploads"),async (r
 
 router.post("/editpersonalpost/:entity/:UID", multer.array("uploads"), async (req,res,next) => {
     let {location, description, address, remainingImageKeys, id, stringTag} = req.body;
-    console.log(stringTag);
     let arrayTag = stringTag.split("#").map(tag => (tag.trim())).slice(1);
     let collection;
     if (req.params.entity === "users") {
@@ -691,8 +693,8 @@ router.post("/deletepersonalpost/:entity/:UID", async (req,res,next) => {
         } else {
             return next(new Error("Route not found, please try again"));
         };
-        post = await postCollection.findOne({_id : postId});
-        user = await userCollection.findOne({_id : req.params.UID});
+        post = await postCollection.findById(postId);
+        user = await userCollection.findById(req.params.UID);
         const sess = await mongoose.startSession();
         sess.startTransaction();
         await postCollection.deleteOne({_id : postId});
