@@ -26,9 +26,6 @@ const s3 = new S3Client({
     },
     region: bucketRegion
 });
-/*
-router.use(validateAuthToken);
-*/
 
 router.post("/auth/register/:entity",
     [check("username").isLength({min : 8}),
@@ -240,6 +237,8 @@ router.post("/auth/resetpassword/:entity", async (req, res, next) => {
         message: "SuccessFully Resetted PassWord"
     });
 });
+
+router.use(validateAuthToken);
 
 router.get("/feed/:entity/:UID", async (req,res,next) => {
     try {

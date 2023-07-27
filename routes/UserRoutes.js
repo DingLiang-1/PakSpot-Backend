@@ -6,6 +6,7 @@ const UsersDatabase = require("../MongooseModel/Users.js");
 const validateAuthToken = require("../authMiddleware.js");
 
 
+router.use(validateAuthToken);
 
 router.post("/getscheduledevents/:UID", validateAuthToken,  async (req,res,next) => {
     const {month, year} = req.body;
