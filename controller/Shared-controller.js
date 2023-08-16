@@ -493,7 +493,10 @@ const uploadPersonalPost = async (req,res,next) => {
         images : imageKeys,
         description : description,
         creator : req.params.UID,
-        tags : arrayTag
+        tags : arrayTag,
+        comments : [],
+        likedBy : [],
+        postType : (req.params.entity === "users" ? "UserPost" : "BusinessPost")
     });
     try {
         const sess = await mongoose.startSession();
@@ -598,12 +601,12 @@ const editPersonalPost = async (req,res,next) => {
         images : imageKeys,
         description : description,
         creator : req.params.UID,
-        tags : arrayTag
+        tags : arrayTag,
     };
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
-        await collection.replaceOne({_id : id}, updatedUpload).session(sess);
+        await collection.updateOne({_id : id}, {$set : updatedUpload}).session(sess);
         await sess.commitTransaction();
         return res.status(200).json({message : "update successful"});
     } catch(err) {
@@ -1030,6 +1033,111 @@ const replyComment = async (req, res, next) => {
 };
 
 
+const deleteComment = async (req, res, next) => {
+    console.log("delete comment");
+    const { entity, UID } = req.params;
+    const { postId, postEntity, commentId } = req.body;
+
+    if (entity !== 'users' && entity !== 'businesses') {
+        return next(new HttpError("Route Not Foud", 404));
+    }
+
+    if (postEntity !== 'UserPost' && postEntity !== 'BusinessPost') {
+        return next(new HttpError("Route Not Foud", 404));
+    }
+
+    const postCollection = postEntity === 'UserPost' ? UsersDatabase.UserPosts : BusinessesDatabase.BusinessPosts;
+    let post;
+
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        
+        post = await postCollection.findById(postId, 'comments').session(sess); 
+        
+        if (!post) {
+            throw new HttpError("Cannot Find Post", 404);
+        }
+
+        console.log(post.comments.length);
+        const commentObj = post.comments.id(commentId);
+        console.log(commentObj);
+        post.comments.pull(commentObj);
+        console.log("pulled object");
+        console.log(post.comments.length);
+        await post.save({session: sess});
+        await sess.commitTransaction();
+        await sess.endSession();
+    } catch (err) {
+        return next(new HttpError(err.message || "Unknown Error Occured", err.code || 404));
+    }
+    return res.status(202).json({
+        message: "Successfully deleted Comment"
+    });
+};
+
+const deleteReply = async (req, res, next) => {
+    console.log("delete comment reply");
+    const { entity } = req.params;
+    const { postId, postEntity, commentId, replyId } = req.body;
+    console.log(entity);
+    console.log(req.body);
+
+    if (entity !== 'users' && entity !== 'businesses') {
+        return next(new HttpError("Route Not Foud", 404));
+    }
+
+    if (postEntity !== 'UserPost' && postEntity !== 'BusinessPost') {
+        return next(new HttpError("Route Not Foud", 404));
+    }
+
+    const postCollection = postEntity === 'UserPost' ? UsersDatabase.UserPosts : BusinessesDatabase.BusinessPosts;
+    let post;
+
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        
+        post = await postCollection.findById(postId, 'comments').session(sess); 
+        
+        
+        if (!post) {
+            throw new HttpError("Cannot Find Post", 404);
+        }
+        const commentObj = post.comments.id(commentId);
+        console.log(commentObj.replies);
+        const replyObj = commentObj.replies.id(replyId);
+        console.log(replyObj);
+        commentObj.replies.pull(replyObj);
+        console.log(commentObj.replies);
+        await post.save({session: sess});
+        await sess.commitTransaction();
+        await sess.endSession();
+        await post.populate('comments.replies.doc');
+        
+        const getReplyInfo = async reply => {
+            const getProfilePic = async key => {
+                const s3Params = {
+                    Bucket : bucketName,
+                    Key : key,
+                };
+                let command = new GetObjectCommand(s3Params);
+                return await getSignedUrl(s3, command, {expiresIn : 86400});
+            }
+            const profilePic = await getProfilePic(reply.doc.profilePicture);
+            const replyObj = reply.toObject({getters: true});
+            replyObj.profilePicture = profilePic;
+            replyObj.id = reply._id;
+            return replyObj;
+        }
+        await Promise.all(commentObj.replies.map(getReplyInfo)).then(repliesArray => {
+            res.status(202).json(repliesArray);
+        });
+    } catch (err) {
+        return next(new HttpError(err.message || "Unknown Error Occured", err.code || 404));
+    };
+};
+
 
 
 
@@ -1056,3 +1164,5 @@ exports.getComments = getComments;
 exports.likeCommentHandler = likeCommentHandler;
 exports.replyComment = replyComment;
 exports.updatePrivacy = updatePrivacy;
+exports.deleteComment = deleteComment;
+exports.deleteReply = deleteReply;

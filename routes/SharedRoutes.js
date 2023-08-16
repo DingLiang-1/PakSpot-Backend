@@ -98,5 +98,11 @@ router.post("/replyComment/:entity/:UID",
 router.post("/updateprivacy/:entity/:UID", 
     sharedController.updatePrivacy);
 
+router.post("/deleteComment/:entity/:UID",
+    sharedController.deleteComment);
+
+router.post("/deleteReply/:entity/:UID",
+    sharedController.deleteReply);
+
 
 module.exports = router;
